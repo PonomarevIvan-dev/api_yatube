@@ -1,12 +1,10 @@
-from rest_framework import viewsets
-from rest_framework.permissions import (
-    IsAuthenticated
-)
 from django.shortcuts import get_object_or_404
 from posts.models import Post, Group
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
-from .serializers import PostSerializer, GroupSerializer, CommentSerializer
 from .permissions import IsAuthorOrReadOnly
+from .serializers import PostSerializer, GroupSerializer, CommentSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -39,14 +37,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         """Возвращает комментарии, отфильтрованные по post_pk из URL."""
         post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
         return post.comments.all()
-
-    def get_object(self):
-        """Возвращает комментарий, отфильтрованный по comment_id из URL."""
-        queryset = self.get_queryset()
-        comment_id = self.kwargs.get('pk')
-        obj = get_object_or_404(queryset, id=comment_id)
-        self.check_object_permissions(self.request, obj)
-        return obj
 
     def perform_create(self, serializer):
         """Создаёт объект с автором-юзером и привязывает к посту."""
